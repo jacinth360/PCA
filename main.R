@@ -13,7 +13,9 @@ library('RColorBrewer')
 #'
 #' @examples
 read_data <- function(intensity_data, delimiter) {
-    return(NULL)
+  data <- suppressWarnings(read_delim(intensity_data, delimiter))
+  data_f <- as.data.frame(data)
+    return(data_f)
 }
 
 #' Define a function to calculate the proportion of variance explained by each PC
@@ -25,7 +27,7 @@ read_data <- function(intensity_data, delimiter) {
 #'
 #' @examples
 calculate_variance_explained <- function(pca_results) {
-    return(NULL)
+  return(return((pca_results$sdev)**2/sum((pca_results$sdev)**2)))
 }
 
 #' Define a function that takes in the variance values and the PCA results to
@@ -43,7 +45,12 @@ calculate_variance_explained <- function(pca_results) {
 #' @export
 #' @examples 
 make_variance_tibble <- function(pca_ve, pca_results) {
-    return(NULL)
+  principal_components <- colnames(pca_results$x)
+  variance_explained <- pca_ve
+  cumulative <- cumsum(variance_explained)
+  tib <- tibble(principal_components, variance_explained, cumulative)
+  colnames(tib) <- c("principal_components", "variance_explained", "cumulative")
+  return(tib)
 }
 
 
@@ -60,7 +67,10 @@ make_variance_tibble <- function(pca_ve, pca_results) {
 #'
 #' @examples
 make_biplot <- function(metadata, pca_results) {
-    return(NULL)
+  meta_data <- read_csv(metadata)
+  six_sub_type <- meta$SixSubtypesClassification
+  ggplot(tibble(data.frame(pca_results$x))[1:2], aes(x = PC1, y = PC2)) +
+    geom_point(aes(color =factor(six_sub_type)))
 }
 
 #' Define a function to return a list of probeids filtered by signifiance
@@ -74,8 +84,9 @@ make_biplot <- function(metadata, pca_results) {
 #'
 #' @examples
 list_significant_probes <- function(diff_exp_tibble, fdr_threshold) {
-    return(NULL)
-}
+  sig_probes <- filter(diff_exp_tibble, padj < fdr_threshold)$probeid
+  return(sig_probes)
+  }
 
 #' Define a function that uses the list of significant probeids to return a
 #' matrix with the intensity values for only those probeids.
@@ -91,8 +102,9 @@ list_significant_probes <- function(diff_exp_tibble, fdr_threshold) {
 #'
 #' @examples
 return_de_intensity <- function(intensity, sig_ids_list) {
-    return(NULL)
-}
+    de_intensity <- subset(intensity, rownames(intensity) %in% sig_ids_list)
+    return(as.matrix(de_intensity))
+    }
 
 #' Define a function that takes the intensity values for significant probes and
 #' creates a color-blind friendly heatmap
@@ -108,7 +120,8 @@ return_de_intensity <- function(intensity, sig_ids_list) {
 #' @export
 #'
 #' @examples
-plot_heatmap <- function(de_intensity, num_colors, palette) {
-    return(NULL)
-}
+plot_heatmap <- function(de_intensity, num_colors, palette='RdBu') {
+  pal <- brewer.pal(num_colors, palette)
+  heatmap(de_intensity, col = pal)
+  }
 
