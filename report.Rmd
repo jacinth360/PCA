@@ -1,7 +1,3 @@
----
-title: Assignment 3
-output: html_document
----
 
 ```{r code block for setup, message=FALSE}
 source('main.R')
